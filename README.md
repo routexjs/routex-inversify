@@ -19,7 +19,7 @@ Setup your app:
 ```js
 import "reflect-metadata";
 import { ICtx, TextBody } from "routex";
-import { RoutexInversifyServer, TYPE } from "@routex/inversify";
+import { RoutexInversifyServer, TYPE, Get, Controller } from "@routex/inversify";
 import { injectable } from "inversify";
 
 @injectable()

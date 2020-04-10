@@ -3,6 +3,20 @@ import { IRouteOptions } from "routex/dist/types/route";
 import * as interfaces from "./interfaces";
 import { METADATA_KEY } from "./constants";
 
+export function Controller(
+  path?: string,
+  middlewares?: interfaces.IMiddleware[]
+) {
+  return function (target: any) {
+    const metadata: interfaces.IControllerMetadata = {
+      path,
+      middlewares,
+      target,
+    };
+    Reflect.defineMetadata(METADATA_KEY.controller, metadata, target);
+  };
+}
+
 export function Method(
   method: routex.Methods,
   path: string,
@@ -37,20 +51,6 @@ export function Method(
     }
 
     metadataList.push(metadata);
-  };
-}
-
-export function Controller(
-  path?: string,
-  middlewares?: interfaces.IMiddleware[]
-) {
-  return function (target: any) {
-    const metadata: interfaces.IControllerMetadata = {
-      path,
-      middlewares,
-      target,
-    };
-    Reflect.defineMetadata(METADATA_KEY.controller, metadata, target);
   };
 }
 
