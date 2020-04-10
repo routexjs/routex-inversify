@@ -86,7 +86,15 @@ export class RoutexInversifyServer {
 
     return middlewares.map((middleware) => {
       try {
-        return this.container.get<routex.Middleware>(middleware);
+        const resolvedMiddleware = this.container.get<
+          routex.Middleware | interfaces.InjectableMiddleware
+        >(middleware);
+
+        if ("middleware" in resolvedMiddleware) {
+          return resolvedMiddleware.middleware;
+        }
+
+        return resolvedMiddleware;
       } catch {
         return middleware as routex.Middleware;
       }

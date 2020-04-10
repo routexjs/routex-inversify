@@ -90,3 +90,12 @@ export class DataTestController {
 
 @injectable()
 export class EmptyTestController {}
+
+@Controller()
+@injectable()
+export class DataMiddlewareTestController {
+  @Get("/", ["TestMiddleware"])
+  name(ctx: ICtx) {
+    return new JsonBody({ name: ctx.data.name });
+  }
+}

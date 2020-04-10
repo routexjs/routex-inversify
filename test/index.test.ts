@@ -1,16 +1,19 @@
 import "reflect-metadata";
 import { Container } from "inversify";
-import { ICtx, Routex } from "routex";
+import { ICtx, default as routex, Routex } from "routex";
 import * as request from "supertest";
 import { RoutexInversifyServer, TYPE } from "../src";
+import * as interfaces from "../src/interfaces";
 import {
   BasicTestController,
   ChildTestController,
+  DataMiddlewareTestController,
   DataTestController,
   EmptyTestController,
   MethodTestController,
   MiddlewareTestController,
 } from "./controllers";
+import { TestMiddleware } from "./middleware";
 
 it("Injects controllers & methods successfully", () => {
   const container = new Container();
@@ -136,6 +139,25 @@ it("Supports empty controller", () => {
 
   return request(server.build().handler)
     .get("/name/john")
+    .expect(`{"name":"john"}`)
+    .expect("Content-Type", /json/)
+    .expect(200);
+});
+
+it("Supports injectable middleware", () => {
+  const container = new Container();
+
+  container
+    .bind(TYPE.Controller)
+    .to(DataMiddlewareTestController)
+    .whenTargetNamed("DataMiddlewareTestController");
+
+  container.bind("TestMiddleware").to(TestMiddleware);
+
+  const server = new RoutexInversifyServer(container);
+
+  return request(server.build().handler)
+    .get("/")
     .expect(`{"name":"john"}`)
     .expect("Content-Type", /json/)
     .expect(200);

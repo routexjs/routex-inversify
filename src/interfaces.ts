@@ -2,6 +2,11 @@ import * as routex from "routex";
 import { IRouteOptions } from "routex/dist/types/route";
 import { interfaces as inversifyInterfaces } from "inversify";
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
+export interface InjectableMiddleware {
+  middleware(ctx: routex.ICtx): Promise<void> | void;
+}
+
 export type IMiddleware =
   | inversifyInterfaces.ServiceIdentifier<any>
   | routex.Middleware;
