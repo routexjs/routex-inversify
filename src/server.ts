@@ -59,10 +59,7 @@ export class RoutexInversifyServer {
         controllerRouter.middleware(controllerMiddleware);
 
         methodMetadatas.forEach((methodMetadata) => {
-          const handler = this.resolveHandler(
-            controllerMetadata.target.name,
-            methodMetadata.key
-          );
+          const handler = (controller as any)[methodMetadata.key];
 
           const routeMiddleware = this.resolveMiddlewares(
             methodMetadata.middlewares
@@ -99,14 +96,5 @@ export class RoutexInversifyServer {
         return middleware as routex.Middleware;
       }
     });
-  }
-
-  private resolveHandler(
-    controllerName: string | number | symbol,
-    key: string
-  ): routex.Handler {
-    return (this.container.getNamed(TYPE.Controller, controllerName) as any)[
-      key
-    ];
   }
 }
