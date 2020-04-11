@@ -1,6 +1,6 @@
 {
   "name": "@routex/inversify",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Inversify decorators for Routex",
   "keywords": [
     "routex",

@@ -99,3 +99,14 @@ export class DataMiddlewareTestController {
     return new JsonBody({ name: ctx.data.name });
   }
 }
+
+@Controller()
+@injectable()
+export class ThisTestController {
+  name = "john";
+
+  @Get("/")
+  getName(ctx: ICtx) {
+    return new JsonBody({ name: this.name });
+  }
+}

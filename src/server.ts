@@ -71,7 +71,7 @@ export class RoutexInversifyServer {
           controllerRouter.route(
             methodMetadata.method,
             methodMetadata.path,
-            [...routeMiddleware, handler],
+            [...routeMiddleware, handler.bind(controller)],
             methodMetadata.options
           );
         });

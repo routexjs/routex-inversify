@@ -12,6 +12,7 @@ import {
   EmptyTestController,
   MethodTestController,
   MiddlewareTestController,
+  ThisTestController,
 } from "./controllers";
 import { TestMiddleware } from "./middleware";
 
@@ -153,6 +154,23 @@ it("Supports injectable middleware", () => {
     .whenTargetNamed("DataMiddlewareTestController");
 
   container.bind("TestMiddleware").to(TestMiddleware);
+
+  const server = new RoutexInversifyServer(container);
+
+  return request(server.build().handler)
+    .get("/")
+    .expect(`{"name":"john"}`)
+    .expect("Content-Type", /json/)
+    .expect(200);
+});
+
+it("Supports this", () => {
+  const container = new Container();
+
+  container
+    .bind(TYPE.Controller)
+    .to(ThisTestController)
+    .whenTargetNamed("ThisTestController");
 
   const server = new RoutexInversifyServer(container);
 
