@@ -16,6 +16,8 @@ export class RoutexInversifyServer {
   private readonly app: routex.Routex;
   private readonly defaultRoot: IRoutexInversifyOptions["defaultRoot"];
 
+  private metadata?: interfaces.IRoutexServerMetadata;
+
   constructor(
     container: inversify.interfaces.Container,
     options?: IRoutexInversifyOptions
@@ -26,61 +28,86 @@ export class RoutexInversifyServer {
   }
 
   public build(): routex.Routex {
-    this.registerControllers();
+    if (!this.metadata) {
+      this.metadata = this.registerControllers();
+    }
 
     return this.app;
   }
 
-  private registerControllers() {
+  private registerControllers(): interfaces.IRoutexServerMetadata {
     const router = this.defaultRoot
       ? this.app.child(this.defaultRoot)
       : this.app;
 
     const controllers = this.container.getAll<object>(TYPE.Controller);
 
-    controllers.forEach((controller) => {
-      const controllerMetadata: interfaces.IControllerMetadata = Reflect.getOwnMetadata(
-        METADATA_KEY.controller,
-        controller.constructor
-      );
-
-      const methodMetadatas: interfaces.IControllerMethodMetadata[] = Reflect.getOwnMetadata(
-        METADATA_KEY.controllerMethod,
-        controller.constructor
-      );
-
-      if (controllerMetadata && methodMetadatas) {
-        const controllerMiddleware = this.resolveMiddlewares(
-          controllerMetadata.middlewares
+    const resolvedControllers = controllers
+      .map((controller): interfaces.IResolvedControllerMetadata | undefined => {
+        // Get metadata from @Controller decorator
+        const controllerMetadata: interfaces.IControllerMetadata = Reflect.getOwnMetadata(
+          METADATA_KEY.controller,
+          controller.constructor
         );
 
-        const controllerRouter = router.child(controllerMetadata.path ?? "/");
+        // Get all @Method decorators from controller
+        const handlerMetadatas: interfaces.IControllerHandlerMetadata[] = Reflect.getOwnMetadata(
+          METADATA_KEY.controllerHandler,
+          controller.constructor
+        );
 
-        controllerRouter.middleware(controllerMiddleware);
-
-        methodMetadatas.forEach((methodMetadata) => {
-          const handler = (controller as any)[methodMetadata.key];
-
-          const routeMiddleware = this.resolveMiddlewares(
-            methodMetadata.middlewares
+        if (controllerMetadata && handlerMetadatas) {
+          const controllerMiddlewares = this.resolveMiddlewares(
+            controllerMetadata.middlewares
           );
 
-          controllerRouter.route(
-            methodMetadata.method,
-            methodMetadata.path,
-            [...routeMiddleware, handler.bind(controller)],
-            methodMetadata.options
+          const controllerRouter = router.child(controllerMetadata.path ?? "/");
+
+          controllerRouter.middleware(controllerMiddlewares);
+
+          const resolvedHandlers = handlerMetadatas.map(
+            (
+              handlerMetadata
+            ): interfaces.IResolvedControllerHandlerMetadata => {
+              const handler = (controller as any)[handlerMetadata.key];
+
+              const handlerMiddlewares = this.resolveMiddlewares(
+                handlerMetadata.middlewares
+              );
+
+              // Add route to controller router
+              controllerRouter.route(
+                handlerMetadata.method,
+                handlerMetadata.path,
+                [...handlerMiddlewares, handler.bind(controller)],
+                handlerMetadata.options
+              );
+
+              return {
+                ...handlerMetadata,
+                resolvedMiddlewares: handlerMiddlewares,
+              };
+            }
           );
-        });
-      }
-    });
+
+          return {
+            ...controllerMetadata,
+            resolvedHandlers,
+            resolvedMiddlewares: controllerMiddlewares,
+            resolvedRouter: controllerRouter,
+          };
+        }
+
+        return undefined;
+      })
+      .filter(Boolean);
+
+    return {
+      controllers: resolvedControllers as interfaces.IResolvedControllerMetadata[],
+    };
   }
 
-  private resolveMiddlewares(middlewares?: interfaces.IMiddleware[]) {
-    if (!middlewares) {
-      return [];
-    }
-
+  private resolveMiddlewares(middlewares: interfaces.IMiddleware[]) {
     return middlewares.map((middleware) => {
       try {
         const resolvedMiddleware = this.container.get<
@@ -96,5 +123,12 @@ export class RoutexInversifyServer {
         return middleware as routex.Middleware;
       }
     });
+  }
+
+  public getMetadata() {
+    this.build();
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this.metadata!;
   }
 }
