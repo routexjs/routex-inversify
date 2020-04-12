@@ -1,5 +1,4 @@
 import * as routex from "routex";
-import { IRouteOptions } from "routex/dist/types/route";
 import { interfaces as inversifyInterfaces } from "inversify";
 
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
@@ -19,7 +18,7 @@ export interface IControllerMetadata {
 
 export interface IControllerMethodMetadata {
   path: string;
-  options?: IRouteOptions;
+  options?: routex.IRouteOptions;
   middlewares?: IMiddleware[];
   target: any;
   method: routex.Methods;

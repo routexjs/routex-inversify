@@ -1,5 +1,4 @@
 import * as routex from "routex";
-import { IRouteOptions } from "routex/dist/types/route";
 import * as interfaces from "./interfaces";
 import { METADATA_KEY } from "./constants";
 
@@ -21,7 +20,7 @@ export function Method(
   method: routex.Methods,
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return function (target: routex.Handler, key: string) {
     const metadata: interfaces.IControllerMethodMetadata = {
@@ -57,7 +56,7 @@ export function Method(
 export function Get(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.GET, path, middlewares, options);
 }
@@ -65,7 +64,7 @@ export function Get(
 export function Post(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.POST, path, middlewares, options);
 }
@@ -73,7 +72,7 @@ export function Post(
 export function Put(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.PUT, path, middlewares, options);
 }
@@ -81,7 +80,7 @@ export function Put(
 export function Patch(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.PATCH, path, middlewares, options);
 }
@@ -89,7 +88,7 @@ export function Patch(
 export function Head(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.HEAD, path, middlewares, options);
 }
@@ -97,7 +96,7 @@ export function Head(
 export function Delete(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.DELETE, path, middlewares, options);
 }
@@ -105,7 +104,7 @@ export function Delete(
 export function Options(
   path: string,
   middlewares?: interfaces.IMiddleware[],
-  options?: IRouteOptions
+  options?: routex.IRouteOptions
 ): interfaces.IHandlerDecorator {
   return Method(routex.Methods.OPTIONS, path, middlewares, options);
 }
