@@ -1,3 +1,7 @@
+## 0.1.1 - 2020-04-12
+
+- Bind `InjectableMiddleware`
+
 ## 0.1.0 - 2020-04-12
 
 - Graduate to beta

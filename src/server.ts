@@ -88,7 +88,7 @@ export class RoutexInversifyServer {
         >(middleware);
 
         if ("middleware" in resolvedMiddleware) {
-          return resolvedMiddleware.middleware;
+          return resolvedMiddleware.middleware.bind(resolvedMiddleware);
         }
 
         return resolvedMiddleware;
