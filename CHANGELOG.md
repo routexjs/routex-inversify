@@ -1,3 +1,8 @@
+## 0.2.0 - Unreleased
+
+- Add `getMetadata()` from `RoutexInversifyServer` for built and resolved metadata
+  - Added `callsites` to track where the decorators are used
+
 ## 0.1.1 - 2020-04-12
 
 - Bind `InjectableMiddleware`

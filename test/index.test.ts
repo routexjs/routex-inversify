@@ -71,7 +71,7 @@ it("Supports middlewares", () => {
   const server = new RoutexInversifyServer(container);
 
   return request(server.build().handler)
-    .get("/name")
+    .get("/middleware/name")
     .expect(`{"name":"JOHN H DOE"}`)
     .expect("Content-Type", /json/)
     .expect(200);
@@ -177,6 +177,54 @@ it("Supports this", () => {
   return request(server.build().handler)
     .get("/")
     .expect(`{"name":"john"}`)
+    .expect("Content-Type", /json/)
+    .expect(200);
+});
+
+it("Injects metadata", () => {
+  const container = new Container();
+  container
+    .bind(TYPE.Controller)
+    .to(MiddlewareTestController)
+    .whenTargetNamed("MiddlewareTestController");
+
+  container.bind("globalMiddleware1").toConstantValue((ctx: ICtx) => {
+    ctx.data.name += " h ";
+  });
+
+  container.bind("globalMiddleware2").toConstantValue((ctx: ICtx) => {
+    ctx.data.name = ctx.data.name.toUpperCase();
+  });
+
+  const server = new RoutexInversifyServer(container);
+
+  const metadata = server.getMetadata();
+
+  expect(metadata.controllers.length).toBe(1);
+
+  const controller = metadata.controllers[0];
+
+  expect(controller.path).toBe("/middleware");
+
+  expect(controller.middlewares.length).toBe(2);
+  expect(controller.middlewares[1]).toBe("globalMiddleware1");
+  expect(controller.resolvedMiddlewares.length).toBe(2);
+
+  expect(controller.resolvedHandlers.length).toBe(1);
+
+  const handler = controller.resolvedHandlers[0];
+
+  expect(handler.path).toBe("/name");
+  expect(handler.method).toBe("get");
+  expect(handler.options).toBe(undefined);
+
+  expect(handler.middlewares.length).toBe(2);
+  expect(handler.middlewares[1]).toBe("globalMiddleware2");
+  expect(handler.resolvedMiddlewares.length).toBe(2);
+
+  return request(server.build().handler)
+    .get("/middleware/name")
+    .expect(`{"name":"JOHN H DOE"}`)
     .expect("Content-Type", /json/)
     .expect(200);
 });

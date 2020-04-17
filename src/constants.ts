@@ -4,5 +4,5 @@ export const TYPE = {
 
 export const METADATA_KEY = {
   controller: "_controller",
-  controllerMethod: "_controller-method",
+  controllerHandler: "_controller-handler",
 };

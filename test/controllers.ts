@@ -37,7 +37,7 @@ function middleware2(ctx: ICtx) {
   ctx.data.name += "doe";
 }
 
-@Controller(undefined, [middleware1, "globalMiddleware1"])
+@Controller("/middleware", [middleware1, "globalMiddleware1"])
 @injectable()
 export class MiddlewareTestController {
   @Get("/name", [middleware2, "globalMiddleware2"])

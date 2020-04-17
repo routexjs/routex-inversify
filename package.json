@@ -1,6 +1,6 @@
 {
   "name": "@routex/inversify",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Inversify decorators for Routex",
   "keywords": [
     "routex",
@@ -64,6 +64,9 @@
     "transform": {
       ".ts": "ts-jest"
     }
+  },
+  "dependencies": {
+    "callsites": "^3.1.0"
   },
   "devDependencies": {
     "@types/jest": "^25.2.1",
